@@ -49,10 +49,10 @@ with nidaqmx.Task() as pulse_task, nidaqmx.Task() as start_trigger_do_task, nida
 
     # --- Create Analog Input channel for each device ---
     ai_task1.ai_channels.add_ai_voltage_chan(
-        device1_ai, min_val=-10, max_val=10, terminal_config= TerminalConfiguration.DIFF
+        device1_ai, min_val=min_val, max_val=max_val, terminal_config= TerminalConfiguration.DIFF
     )
     ai_task2.ai_channels.add_ai_voltage_chan(
-        device2_ai, min_val=-10, max_val=10, terminal_config=TerminalConfiguration.DIFF
+        device2_ai, min_val=min_val, max_val=max_val, terminal_config=TerminalConfiguration.DIFF
     )
 
     # --- Configure task timing to Finite ---

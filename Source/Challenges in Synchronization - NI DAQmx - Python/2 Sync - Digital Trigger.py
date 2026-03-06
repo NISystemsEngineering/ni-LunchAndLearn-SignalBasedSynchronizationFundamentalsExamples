@@ -56,10 +56,10 @@ with nidaqmx.Task() as pulse_task, nidaqmx.Task() as start_trigger_do_task:
         with nidaqmx.Task() as ai_task1, nidaqmx.Task() as ai_task2:
             # --- Create Analog Input channel for each device ---
             ai_task1.ai_channels.add_ai_voltage_chan(
-                device1_ai, min_val=-10, max_val=10, terminal_config= TerminalConfiguration.DIFF
+                device1_ai, min_val=min_val, max_val=max_val, terminal_config= TerminalConfiguration.DIFF
             )
             ai_task2.ai_channels.add_ai_voltage_chan(
-                device2_ai, min_val=-10, max_val=10, terminal_config=TerminalConfiguration.DIFF
+                device2_ai, min_val=min_val, max_val=max_val, terminal_config=TerminalConfiguration.DIFF
             )
 
             # --- Configure task timing to Finite ---
@@ -112,10 +112,12 @@ with nidaqmx.Task() as pulse_task, nidaqmx.Task() as start_trigger_do_task:
                 key_pressed = plt.waitforbuttonpress()
             plt.close()
 
-# --- Skew Statistics ---
+# --- Statistics ---
 skews = np.array(skews)
-print(f"\nMean Skew: {np.mean(skews):.2f} samples")
-print(f"Range: {np.ptp(skews)} samples")
-print(f"Standard Deviation: {np.std(skews):.2f} samples")
-print("")
-input("Press Enter to Exit...")
+mean_skew = np.mean(skews)
+range_skew = np.ptp(skews)
+std_skew = np.std(skews)
+
+print(f"\nMean Skew: {mean_skew:f} samples")
+print(f"Range: {range_skew} samples")
+print(f"Standard Deviation: {std_skew:.2f} samples")

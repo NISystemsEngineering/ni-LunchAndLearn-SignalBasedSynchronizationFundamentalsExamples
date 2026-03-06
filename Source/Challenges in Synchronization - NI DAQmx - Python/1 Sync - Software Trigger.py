@@ -80,9 +80,10 @@ with (nidaqmx.Task() as pulse_task):
             # --- Stop Square Wave Generation ---
             pulse_task.stop()
 
-            # --- Calculate Skew ---
+            # --- Analyze Skew ---
             skew = find_rising_edge_sample_offset(np.array(data1), np.array(data2))
             skews.append(skew)
+            print(f"Iteration {i+1}: Skew = {skew} samples")
 
             # --- Plot (optional) ---
             plt.figure()
@@ -102,5 +103,6 @@ mean_skew = np.mean(skews)
 range_skew = np.ptp(skews)
 std_skew = np.std(skews)
 
-print(f"Skew (samples) per iteration: {skews}")
-print(f"Mean: {mean_skew:.2f}, Range: {range_skew}, Std Dev: {std_skew:.2f}")
+print(f"\nMean Skew: {mean_skew:f} samples")
+print(f"Range: {range_skew} samples")
+print(f"Standard Deviation: {std_skew:.2f} samples")
