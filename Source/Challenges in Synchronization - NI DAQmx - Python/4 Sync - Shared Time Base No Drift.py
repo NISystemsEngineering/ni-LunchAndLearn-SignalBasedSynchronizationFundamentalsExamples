@@ -28,39 +28,54 @@ def find_rising_edge_sample_offset(wave1, wave2):
     thresh = (np.max(wave1) + np.min(wave1)) / 2
     idx1 = np.argmax(wave1 > thresh)
     idx2 = np.argmax(wave2 > thresh)
-    return idx2 - idx1
+    return idx1 - idx2
 
 # --- Generate Square Wave, Monitor, And Calculate Skew ---
 with nidaqmx.Task() as pulse_task, nidaqmx.Task() as start_trigger_do_task, nidaqmx.Task() as ai_task1, nidaqmx.Task() as ai_task2:
     # --- Create Internal Counter Channel / Square Wave ---
     pulse_task.co_channels.add_co_pulse_chan_freq(
-        square_wave_counter, freq=square_wave_frequency, duty_cycle=square_wave_duty_cycle
+        square_wave_counter,
+        freq=square_wave_frequency,
+        duty_cycle=square_wave_duty_cycle
     )
     # --- Configure task timing to Continuous ---
-    pulse_task.timing.cfg_implicit_timing(
-        sample_mode=AcquisitionType.CONTINUOUS
-    )
+    pulse_task.timing.cfg_implicit_timing(sample_mode=AcquisitionType.CONTINUOUS)
+
     # --- Export Internal Counter Channel to Terminal ---
     pulse_task.export_signals.ctr_out_event_output_term = square_wave_terminal
 
     # --- Create Analog Input channel for each device ---
     ai_task1.ai_channels.add_ai_voltage_chan(
-        device1_ai, min_val=min_val, max_val=max_val, terminal_config= TerminalConfiguration.DIFF
+        device1_ai,
+        min_val=min_val,
+        max_val=max_val,
+        terminal_config= TerminalConfiguration.DIFF
     )
     ai_task2.ai_channels.add_ai_voltage_chan(
-        device2_ai, min_val=min_val, max_val=max_val, terminal_config=TerminalConfiguration.DIFF
+        device2_ai,
+        min_val=min_val,
+        max_val=max_val,
+        terminal_config=TerminalConfiguration.DIFF
     )
 
-    # --- Configure task timing to Finite ---
+    # --- Configure task timing to Continuous & Use Set Clock Source ---
     ai_task1.timing.cfg_samp_clk_timing(
-        sample_rate, source=device1_sample_clock, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=10*samples_per_channel
+        sample_rate,
+        source=device1_sample_clock,
+        sample_mode=AcquisitionType.CONTINUOUS,
+        samps_per_chan=10*samples_per_channel
     )
     ai_task2.timing.cfg_samp_clk_timing(
-        sample_rate, source=device2_sample_clock, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=10*samples_per_channel
+        sample_rate,
+        source=device2_sample_clock,
+        sample_mode=AcquisitionType.CONTINUOUS,
+        samps_per_chan=10*samples_per_channel
     )
 
-    # --- Start Tasks ---
+    # --- Start Task2 ---
     ai_task2.start()
+
+    # --- Export Task1 clock to an output terminal; externally wired to device 2---
     ai_task1.export_signals.samp_clk_output_term = device1_exported_sample_clock_term
     ai_task1.start()
 
