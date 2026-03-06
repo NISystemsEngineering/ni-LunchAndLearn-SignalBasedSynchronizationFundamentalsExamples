@@ -20,13 +20,7 @@ square_wave_duty_cycle = 0.5
 # --- Skew Test Initialization ---
 num_iterations = 5
 skews = []
-"""
-def find_delta_samples_of_rising_edge(wave1, wave2, threshold=0.5):
-    # Finds the sample offset between the first rising edge in two waveforms.
-    idx1 = np.argmax(wave1 > threshold)
-    idx2 = np.argmax(wave2 > threshold)
-    return idx2 - idx1
-"""
+
 def find_rising_edge_sample_offset(wave1, wave2):
     # Simple edge detection: find first rising edge in each waveform
     thresh = (np.max(wave1) + np.min(wave1)) / 2
